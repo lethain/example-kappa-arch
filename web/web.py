@@ -1,4 +1,6 @@
-from flask import Flask
+import datetime
+import time
+from flask import Flask, request
 from pykafka import KafkaClient
 from pykafka.protocol import CreateTopicRequest
 
@@ -32,11 +34,19 @@ def create_topic(client, names):
     broker.create_topics(topics, 5000)
 
 
+def publish(client, topic, msg):
+    with client.topics[topic].get_sync_producer(linger_ms=0) as producer:
+        producer.produce(request.base_url.encode('utf-8'))
+
+
+
 @app.route('/')
 def hello():
     client = get_client()
-
-    return "Hello world!"
+    start = time.time()
+    publish(client, VIEW_TOPIC, request.base_url)
+    elapsed = time.time() - start
+    return "Hello world at %s! Spent %0.2f seconds in Kafka." % (datetime.datetime.now(), elapsed)
 
 
 if __name__ == "__main__":

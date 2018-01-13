@@ -9,6 +9,14 @@ services:
       - ./web:/web
     depends_on:
       - "kafka"
+  consumer:
+    build: ./consumer
+    restart: always
+    volumes:
+
+      - ./consumer:/consumer
+    depends_on:
+      - "kafka"
   zookeeper:
     build: ./zookeeper
     ports:
