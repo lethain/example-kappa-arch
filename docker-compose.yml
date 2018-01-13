@@ -2,10 +2,13 @@ version: '3'
 services:
   web:
     build: ./web
+    restart: always
     ports:
       - "5000:5000"
     volumes:
       - ./web:/web
+    depends_on:
+      - "kafka"
   zookeeper:
     build: ./zookeeper
     ports:
@@ -14,4 +17,5 @@ services:
     build: ./kafka
     ports:
       - "9092:9092"
-      
+    depends_on:
+      - "zookeeper"
