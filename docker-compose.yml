@@ -1,0 +1,17 @@
+version: '3'
+services:
+  web:
+    build: ./web
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./web:/web
+  zookeeper:
+    build: ./zookeeper
+    ports:
+      - 2181:2181
+  kafka:
+    build: ./kafka
+    ports:
+      - "9092:9092"
+      
