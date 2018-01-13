@@ -1,3 +1,5 @@
+import time
+import logging
 from pykafka import KafkaClient
 from pykafka.protocol import CreateTopicRequest
 
@@ -21,11 +23,11 @@ def get_client():
 def run():
     cli = get_client()
     topic = cli.topics[VIEW_TOPIC]
-    consumer = topic.get_simple_consumer()
+    consumer = topic.get_simple_consumer(reset_offset_on_start=True)
+    logging.info("Starting to consume %s", topic)
     for message in consumer:
         if message is not None:
-            print("%s: %s" % (message.offset, message.value))
-
+            logging.warning("%s: %s", message.offset, message.value)
 
 if __name__ == "__main__":
     run()

@@ -13,7 +13,6 @@ services:
     build: ./consumer
     restart: always
     volumes:
-
       - ./consumer:/consumer
     depends_on:
       - "kafka"
