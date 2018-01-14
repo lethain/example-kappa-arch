@@ -1,6 +1,6 @@
 import datetime
 import time
-from flask import Flask, request
+from flask import Flask, request, render_template
 from pykafka import KafkaClient
 from pykafka.protocol import CreateTopicRequest
 
@@ -46,7 +46,10 @@ def hello():
     start = time.time()
     publish(client, VIEW_TOPIC, request.base_url)
     elapsed = time.time() - start
-    return "Hello world at %s! Spent %0.2f seconds in Kafka." % (datetime.datetime.now(), elapsed)
+
+    posts = []
+    now = datetime.datetime.now()
+    return render_template('index.html', posts=posts, elapsed=elapsed, now=now)
 
 
 if __name__ == "__main__":
