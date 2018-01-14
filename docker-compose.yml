@@ -9,6 +9,7 @@ services:
       - ./web:/web
     depends_on:
       - "kafka"
+      - "redis"
   consumer:
     build: ./consumer
     restart: always
@@ -16,6 +17,7 @@ services:
       - ./consumer:/consumer
     depends_on:
       - "kafka"
+      - "redis"      
   zookeeper:
     build: ./zookeeper
     ports:
@@ -26,3 +28,5 @@ services:
       - "9092:9092"
     depends_on:
       - "zookeeper"
+  redis:
+    image: "redis:alpine"

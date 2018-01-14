@@ -3,10 +3,13 @@ import time
 from flask import Flask, request, render_template
 from pykafka import KafkaClient
 from pykafka.protocol import CreateTopicRequest
+import redis
 
 
 POST_TOPIC = "post".encode("utf-8")
 VIEW_TOPIC = "view".encode("utf-8")
+RECENT_KEY = 'posts'
+TOP_KEY = 'top_posts'
 TOPICS = (POST_TOPIC, VIEW_TOPIC)
 
 
@@ -40,16 +43,23 @@ def publish(client, topic, msg):
 
 
 
-@app.route('/')
-def hello():
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def hello(path):
     client = get_client()
     start = time.time()
-    publish(client, VIEW_TOPIC, request.base_url)
+    publish(client, VIEW_TOPIC, path)
     elapsed = time.time() - start
 
-    posts = []
-    now = datetime.datetime.now()
-    return render_template('index.html', posts=posts, elapsed=elapsed, now=now)
+    r = redis.Redis(host='redis')
+    ts = int(time.time())
+    r.zadd(RECENT_KEY, path, ts)    
+    recent = r.zrange(RECENT_KEY, 0, 10, desc=True, withscores=True)
+    r.zincrby(TOP_KEY, path, 1)
+    top = r.zrange(TOP_KEY, 0, 10, desc=True, withscores=True)
+
+    now = datetime.datetime.now()           
+    return render_template('index.html', path=path, recent=recent, top=top, elapsed=elapsed, now=now)
 
 
 if __name__ == "__main__":

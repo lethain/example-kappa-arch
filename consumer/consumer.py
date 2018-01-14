@@ -1,5 +1,6 @@
 import time
 import logging
+import redis
 from pykafka import KafkaClient
 from pykafka.protocol import CreateTopicRequest
 
@@ -23,7 +24,7 @@ def get_client():
 def run():
     cli = get_client()
     topic = cli.topics[VIEW_TOPIC]
-    consumer = topic.get_simple_consumer(reset_offset_on_start=True)
+    consumer = topic.get_simple_consumer(reset_offset_on_start=True, queued_max_messages=1)
     logging.info("Starting to consume %s", topic)
     for message in consumer:
         if message is not None:

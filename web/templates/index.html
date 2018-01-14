@@ -2,16 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Social blog thing</title>
+    <title>{{ path }}</title>
   </head>
   <body>
-    <h1>Social blog thing</h1>
+    <h1>{{ path }}</h1>
     <p>Spent {{ elapsed|round(3, 'floor') }} seconds publishing to Kafka. Rendered at {{ now.strftime('%H:%M:%S') }}.</p>
 
-    <h2>Posts</h2>
+    <h2>Top posts</h2>
     <ul class="posts">
-      {% for post in posts %}
-      <li>{{ post.title }}</li>
+      {% for name, count in top %}
+      <li>{{ name.decode('utf-8') }} at {{ count|int }}</li>
+    {% endfor %}
+    </ul>        
+
+    <h2>Recent posts</h2>
+    <ul class="posts">
+      {% for name, time in recent %}
+      <li>{{ name.decode('utf-8') }} at {{ time }}</li>
     {% endfor %}
     </ul>    
   </body>
