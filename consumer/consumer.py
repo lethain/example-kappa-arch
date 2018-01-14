@@ -8,7 +8,8 @@ from pykafka.protocol import CreateTopicRequest
 POST_TOPIC = "post".encode("utf-8")
 VIEW_TOPIC = "view".encode("utf-8")
 TOPICS = (POST_TOPIC, VIEW_TOPIC)
-
+RECENT_KEY = 'posts'
+TOP_KEY = 'top_posts'
 
 client = None
 
@@ -29,6 +30,16 @@ def run():
     for message in consumer:
         if message is not None:
             logging.warning("%s: %s", message.offset, message.value)
+            path = message.value.decode('utf-8')
+
+            # handle weird old data
+            prefix = 'http://localhost:5000'
+            if path.startswith(prefix):
+                path = path[len(prefix):]
+            r = redis.Redis(host='redis')
+            ts = int(time.time())
+            r.zadd(RECENT_KEY, path, ts)
+            r.zincrby(TOP_KEY, path, 1)
 
 if __name__ == "__main__":
     run()

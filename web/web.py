@@ -52,10 +52,8 @@ def hello(path):
     elapsed = time.time() - start
 
     r = redis.Redis(host='redis')
-    ts = int(time.time())
-    r.zadd(RECENT_KEY, path, ts)    
+
     recent = r.zrange(RECENT_KEY, 0, 10, desc=True, withscores=True)
-    r.zincrby(TOP_KEY, path, 1)
     top = r.zrange(TOP_KEY, 0, 10, desc=True, withscores=True)
 
     now = datetime.datetime.now()           
